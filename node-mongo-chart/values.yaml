@@ -1,0 +1,19 @@
+app:
+  name: nodejs-frontend
+  image:
+    repository: akhilsathyan/nodejs-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  port: 3000
+
+mongo:
+  name: mongodb
+  image:
+    repository: mongo
+    tag: latest
+  port: 27017
+
+service:
+  name: nodejs-mongo-app-service
+  port: 3000
+
