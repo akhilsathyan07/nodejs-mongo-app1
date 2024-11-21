@@ -5,7 +5,7 @@ FROM node:18
 WORKDIR /usr/src/app
 
 # Step 3: Copy the package.json and install dependencies
-COPY package.json ./
+COPY package*.json ./
 RUN npm install
 
 # Step 4: Copy the entire application to the working directory inside the container

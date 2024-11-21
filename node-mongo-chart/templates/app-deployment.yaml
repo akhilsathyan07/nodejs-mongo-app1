@@ -22,4 +22,8 @@ spec:
           env:
             - name: MONGO_URI
               value: "mongodb://{{ .Values.mongo.name }}:{{ .Values.mongo.port }}/{{ .Values.app.name }}"
+      imagePullSecrets:
+        {{- if .Values.app.image.pullSecrets }}
+        {{- toYaml .Values.app.image.pullSecrets | nindent 8 }}
+        {{- end }}
 
