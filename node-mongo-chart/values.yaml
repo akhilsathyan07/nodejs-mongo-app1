@@ -3,10 +3,10 @@ app:
   image:
     repository: us-central1-docker.pkg.dev/symmetric-ion-441609-t1/gc-registry07/nodejs-mongo-app
     tag: latest
-      # digest: sha256:9587971096ecf5995398f21b07302e87922e95ffcd04070335ac3e0eb10c0117
-  pullPolicy: Always
-  pullSecrets:
-    - name: registrykey  # Name of the Docker registry secret
+    # digest: sha256:9587971096ecf5995398f21b07302e87922e95ffcd04070335ac3e0eb10c0117
+    pullPolicy: Always
+    pullSecrets:
+      - name: registrykey  # Name of the Docker registry secret
   port: 3000
 
 mongo:
@@ -15,8 +15,10 @@ mongo:
     repository: mongo
     tag: latest
   port: 27017
+  service:
+    type: LoadBalancer
+    port: 27017
 
 service:
   name: nodejs-mongo-app-service
   port: 3000
-
