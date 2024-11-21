@@ -19,4 +19,3 @@ spec:
           image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
           ports:
             - containerPort: {{ .Values.mongo.port }}
-
