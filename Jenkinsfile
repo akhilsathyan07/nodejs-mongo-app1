@@ -85,6 +85,31 @@ pipeline {
             }
         }
 
+        stage('Install Trivy') {
+            steps {
+                script {
+                    // Install Trivy
+                    sh """
+                    apt update && apt install rpm -y
+                    rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.rpm
+                    """
+                }
+            }
+        }
+
+        stage('Scan Docker Image') {
+            steps {
+                script {
+                    // Verify Trivy installation and scan the Docker image
+                    sh """
+                    trivy --version
+                    docker images
+                    trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
+                    """
+                }
+            }
+        }
+
         stage('Deploy with Helm') {
             steps {
                 script {
@@ -113,4 +138,5 @@ pipeline {
         }
     }
 }
+
 
