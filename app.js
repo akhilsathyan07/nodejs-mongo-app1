@@ -41,7 +41,7 @@ app.post('/register', async (req, res) => {
 
     // Save the new user to the database
     await newUser.save();
-    res.send('User registered successfully');
+    res.send('Team registered successfully');
   } catch (err) {
     console.error(err);
     res.send('Error occurred during registration');
