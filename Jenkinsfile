@@ -6,7 +6,7 @@ pipeline {
         PROJECT_ID = "symmetric-ion-441609-t1" // Replace with your GCP project ID
         GCR_HOST = "us-central1-docker.pkg.dev/symmetric-ion-441609-t1/gc-registry07"
         IMAGE_NAME = "nodejs-mongo-app"
-        IMAGE_TAG = "latest"
+        IMAGE_TAG = "${BUILD_NUMBER}" // Use Jenkins build number as the tag
         
         // Kubernetes Namespace
         KUBE_NAMESPACE = "node-mongo"
@@ -67,7 +67,7 @@ pipeline {
                 script {
                     // Build the Docker image
                     sh """
-                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} .
                     """
                 }
             }
@@ -79,7 +79,7 @@ pipeline {
                     // Push the Docker image to GCR
                     sh """
                     gcloud auth configure-docker ${GCR_HOST}
-                    docker push ${GCR_HOST}/${IMAGE_NAME}:${IMAGE_TAG}
+                    docker push ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
                     """
                 }
             }
@@ -95,7 +95,7 @@ pipeline {
                             --namespace ${KUBE_NAMESPACE} \
                             --create-namespace \
                             --set app.image.repository=${GCR_HOST}/${IMAGE_NAME} \
-                            --set app.image.tag=${IMAGE_TAG} \
+                            --set app.image.tag=${BUILD_NUMBER} \
                             --kubeconfig $KUBECONFIG
                         """
                     }
@@ -113,3 +113,4 @@ pipeline {
         }
     }
 }
+
