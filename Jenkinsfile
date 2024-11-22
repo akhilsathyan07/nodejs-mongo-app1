@@ -88,10 +88,9 @@ pipeline {
         stage('Install Trivy') {
             steps {
                 script {
-                    // Install Trivy
+                    // Download and install Trivy directly as a binary
                     sh """
-                    apt update && apt install rpm -y
-                    rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.rpm
+                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
                     """
                 }
             }
@@ -138,5 +137,3 @@ pipeline {
         }
     }
 }
-
-
