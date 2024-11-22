@@ -14,12 +14,17 @@
       margin: 0; /* Remove default body margin */
       font-family: Arial, sans-serif; /* Optional font */
     }
-    form {
-      background-color: #ffffff; /* White background for the form */
+    .container {
+      display: flex;
+      align-items: center;
+      background-color: #ffffff;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for better look */
-      text-align: center; /* Center text alignment */
+    }
+    .form-container {
+      text-align: center;
+      margin-right: 20px; /* Space between form and image */
     }
     h1, h2 {
       margin-bottom: 20px;
@@ -40,22 +45,33 @@
     button:hover {
       background-color: #0056b3; /* Darker blue on hover */
     }
+    .image-container img {
+      max-width: 300px; /* Limit image size */
+      border-radius: 8px; /* Optional rounded corners */
+    }
   </style>
 </head>
 <body>
-  <form action="/register" method="POST">
-    <h1>Welcome to Team Registry Portal</h1>
-    <h2>Create Your Team</h2>
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
+  <div class="container">
+    <div class="form-container">
+      <h1>Welcome to Team Registry Portal</h1>
+      <h2>Create Your Team</h2>
+      <form action="/register" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
 
-    <button type="submit">Apply</button>
-  </form>
+        <button type="submit">Apply</button>
+      </form>
+    </div>
+    <div class="image-container">
+      <img src="https://images.app.goo.gl/o1UJqDoshB2Mhiuf7" alt="Teamwork Illustration">
+    </div>
+  </div>
 </body>
 </html>
