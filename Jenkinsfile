@@ -103,7 +103,7 @@ pipeline {
         stage('Scan Docker Image') {
             steps {
                 script {
-                    // Verify Trivy installation and scan the Docker image
+                    // Verify Trivy installation and scan the Docker image with the latest build number
                     sh """
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
