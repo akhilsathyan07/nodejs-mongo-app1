@@ -2,7 +2,7 @@ app:
   name: nodejs-frontend
   image:
     repository: us-central1-docker.pkg.dev/symmetric-ion-441609-t1/gc-registry07/nodejs-mongo-app
-    tag: latest
+    tag: 39
     # digest: sha256:9587971096ecf5995398f21b07302e87922e95ffcd04070335ac3e0eb10c0117
     pullPolicy: Always
     pullSecrets:
