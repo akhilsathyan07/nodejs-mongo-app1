@@ -17,6 +17,9 @@ pipeline {
         // Credentials
         GCP_SERVICE_ACCOUNT = "gcp-serv-acc" // GCP service account credentials
         KUBECONFIG_CREDENTIALS_ID = "kubeconfig" // Kubernetes kubeconfig credentials
+
+        // Custom Trivy Installation Directory
+        TRIVY_INSTALL_DIR = "${WORKSPACE}/trivy"
     }
 
     stages {
@@ -88,9 +91,10 @@ pipeline {
         stage('Install Trivy') {
             steps {
                 script {
-                    // Download and install Trivy directly as a binary
+                    // Install Trivy in a custom directory
                     sh """
-                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                    mkdir -p ${TRIVY_INSTALL_DIR}
+                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b ${TRIVY_INSTALL_DIR}
                     """
                 }
             }
@@ -101,9 +105,9 @@ pipeline {
                 script {
                     // Verify Trivy installation and scan the Docker image
                     sh """
-                    trivy --version
+                    ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
-                    trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
+                    ${TRIVY_INSTALL_DIR}/trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
                     """
                 }
             }
