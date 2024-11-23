@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 
 // Handle the form submission to store user details
 app.post('/register', async (req, res) => {
-  const { name, email, number } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -36,7 +36,7 @@ app.post('/register', async (req, res) => {
     const newUser = new User({
       name,
       email,
-      number
+      password
     });
 
     // Save the new user to the database
@@ -52,4 +52,3 @@ app.post('/register', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
