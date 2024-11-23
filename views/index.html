@@ -6,84 +6,45 @@
   <title>Create Your Team</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background-image: url('https://w7.pngwing.com/pngs/595/967/png-transparent-world-cup-background-football-stadium-other-sport-symmetry.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-      height: 100vh;
+      background-color: #f0f8ff; /* Light blue background */
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh; /* Full height viewport */
+      margin: 0; /* Remove default body margin */
+      font-family: Arial, sans-serif; /* Optional font */
+      background-image: url('https://w7.pngwing.com/pngs/595/967/png-transparent-world-cup-background-football-stadium-other-sport-symmetry.png'); /* Placeholder image */
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: right center;
     }
-
     form {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 10px;
-      padding: 30px 20px;
-      width: 100%;
+      background-color: #ffffff; /* White background for the form */
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for better look */
+      text-align: center; /* Center text alignment */
       max-width: 400px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-      text-align: center;
+      width: 100%;
     }
-
-    h1 {
-      font-size: 24px;
-      color: #333;
-      margin-bottom: 10px;
-    }
-
-    h2 {
-      font-size: 18px;
-      color: #555;
+    h1, h2 {
       margin-bottom: 20px;
     }
-
-    label {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 5px;
-      text-align: left;
+    label, input, button {
       display: block;
-    }
-
-    input {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.3s ease-in-out;
+      margin-bottom: 10px;
     }
-
-    input:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    }
-
     button {
-      background: #007bff;
-      color: #fff;
-      padding: 10px 15px;
+      background-color: #007bff; /* Blue button */
+      color: white;
       border: none;
-      border-radius: 5px;
-      font-size: 16px;
+      padding: 10px;
+      border-radius: 4px;
       cursor: pointer;
-      transition: background 0.3s ease-in-out;
-      width: 100%;
     }
-
     button:hover {
-      background: #0056b3;
-    }
-
-    @media (max-width: 768px) {
-      form {
-        width: 90%;
-      }
+      background-color: #0056b3; /* Darker blue on hover */
     }
   </style>
 </head>
@@ -92,13 +53,13 @@
     <h1>Welcome to Team Registry Portal</h1>
     <h2>Create Your Team Profile</h2>
     <label for="name">Team Name:</label>
-    <input type="text" id="name" name="name" placeholder="Enter team name" required>
+    <input type="text" id="name" name="name" required>
 
-    <label for="email">Player Mail ID:</label>
-    <input type="email" id="email" name="email" placeholder="Enter player email" required>
+    <label for="email">Player Mail id:</label>
+    <input type="email" id="email" name="email" required>
 
-    <label for="number">Jersey Number:</label>
-    <input type="text" id="number" name="number" placeholder="Enter jersey number" required>
+    <label for="password">Jersey Number:</label>
+    <input type="password" id="password" name="password" required>
 
     <button type="submit">Apply</button>
   </form>
