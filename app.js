@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 
 // Handle the form submission to store user details
 app.post('/register', async (req, res) => {
-  const { name, email, jersey number } = req.body;
+  const { name, email, number } = req.body;
 
   try {
     // Check if user already exists
@@ -36,7 +36,7 @@ app.post('/register', async (req, res) => {
     const newUser = new User({
       name,
       email,
-      jersey number
+      number
     });
 
     // Save the new user to the database
