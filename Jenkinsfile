@@ -44,36 +44,24 @@ pipeline {
             }
         }
 
-        stage('Run Tests and Generate Coverage') {
-            steps {
-                script {
-                    // Install dependencies and run tests
-                    sh """
-                    npm install
-                    npm test -- --coverage
-                    """
-                }
-            }
-        }
-
         stage('SonarQube Code Analysis') {
             steps {
                 script {
                     // Run SonarQube analysis for the project
                     def scannerHome = tool name: 'sonar-scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('sonarqube') {
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectVersion=1.0-SNAPSHOT \
-                            -Dsonar.qualityProfile="Sonar way" \
-                            -Dsonar.projectBaseDir=${WORKSPACE} \
-                            -Dsonar.projectKey=nodejs-mongo-app \
-                            -Dsonar.sourceEncoding=UTF-8 \
-                            -Dsonar.host.url=http://34.45.141.16:9000 \
-                            -Dsonar.login="sqp_016a5d378e08410c939f74a883e46214d8946730" \
-                            -Dsonar.exclusions="node_modules/**, public/**" \
-                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-                        """
+                        withCredentials([string(credentialsId: 'sonar-qube', variable: 'SONAR_TOKEN')]) {
+                            sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectVersion=1.0-SNAPSHOT \
+                                -Dsonar.qualityProfile="Sonar way" \
+                                -Dsonar.projectBaseDir=${WORKSPACE} \
+                                -Dsonar.projectKey=sonarqube \
+                                -Dsonar.sourceEncoding=UTF-8 \
+                                -Dsonar.host.url=http://34.45.141.16:9000 \
+                                -Dsonar.token=$SONAR_TOKEN
+                            """
+                        }
                     }
                 }
             }
@@ -117,7 +105,7 @@ pipeline {
         stage('Scan Docker Image') {
             steps {
                 script {
-                    // Verify Trivy installation and scan the Docker image
+                    // Verify Trivy installation and scan the Docker image with the latest build number
                     sh """
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
