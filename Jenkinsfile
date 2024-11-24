@@ -44,6 +44,18 @@ pipeline {
             }
         }
 
+        stage('Run Tests and Generate Coverage') {
+            steps {
+                script {
+                    // Run tests and generate coverage report
+                    sh """
+                    npm install
+                    npm run test -- --coverage
+                    """
+                }
+            }
+        }
+
         stage('SonarQube Code Analysis') {
             steps {
                 script {
@@ -59,7 +71,8 @@ pipeline {
                                 -Dsonar.projectKey=sonarqube \
                                 -Dsonar.sourceEncoding=UTF-8 \
                                 -Dsonar.host.url=http://34.45.141.16:9000 \
-                                -Dsonar.token=$SONAR_TOKEN
+                                -Dsonar.token=$SONAR_TOKEN \
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                             """
                         }
                     }
