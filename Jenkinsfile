@@ -44,6 +44,18 @@ pipeline {
             }
         }
 
+        stage('Run Tests and Generate Coverage') {
+            steps {
+                script {
+                    // Install dependencies and run tests
+                    sh """
+                    npm install
+                    npm test -- --coverage
+                    """
+                }
+            }
+        }
+
         stage('SonarQube Code Analysis') {
             steps {
                 script {
@@ -55,10 +67,12 @@ pipeline {
                             -Dsonar.projectVersion=1.0-SNAPSHOT \
                             -Dsonar.qualityProfile="Sonar way" \
                             -Dsonar.projectBaseDir=${WORKSPACE} \
-                            -Dsonar.projectKey=sonarqube \
+                            -Dsonar.projectKey=nodejs-mongo-app \
                             -Dsonar.sourceEncoding=UTF-8 \
                             -Dsonar.host.url=http://34.45.141.16:9000 \
-                            -Dsonar.login="sqp_016a5d378e08410c939f74a883e46214d8946730"
+                            -Dsonar.login="sqp_016a5d378e08410c939f74a883e46214d8946730" \
+                            -Dsonar.exclusions="node_modules/**, public/**" \
+                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                         """
                     }
                 }
