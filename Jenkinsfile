@@ -6,6 +6,7 @@ pipeline {
         PROJECT_ID = "symmetric-ion-441609-t1" // Replace with your GCP project ID
         GCR_HOST = "us-central1-docker.pkg.dev/symmetric-ion-441609-t1/gc-registry07"
         IMAGE_NAME = "nodejs-mongo-app"
+        IMAGE_TAG = "${BUILD_NUMBER}" // Use Jenkins build number as the tag
         
         // Kubernetes Namespace
         KUBE_NAMESPACE = "node-mongo"
@@ -53,12 +54,15 @@ pipeline {
                             sh """
                             ${scannerHome}/bin/sonar-scanner \
                                 -Dsonar.projectVersion=1.0-SNAPSHOT \
+                                -Dsonar.qualityProfile="Sonar way" \
                                 -Dsonar.projectBaseDir=${WORKSPACE} \
                                 -Dsonar.projectKey=sonarqube \
                                 -Dsonar.sourceEncoding=UTF-8 \
                                 -Dsonar.host.url=http://34.45.141.16:9000 \
-                                -Dsonar.login=$SONAR_TOKEN \
+                                -Dsonar.token=$SONAR_TOKEN \
                                 -Dsonar.scm.provider=git
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+
                             """
                         }
                     }
@@ -71,7 +75,7 @@ pipeline {
                 script {
                     // Build the Docker image
                     sh """
-                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${env.BUILD_NUMBER} .
+                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} .
                     """
                 }
             }
@@ -83,7 +87,7 @@ pipeline {
                     // Push the Docker image to GCR
                     sh """
                     gcloud auth configure-docker ${GCR_HOST}
-                    docker push ${GCR_HOST}/${IMAGE_NAME}:${env.BUILD_NUMBER}
+                    docker push ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
                     """
                 }
             }
@@ -108,7 +112,7 @@ pipeline {
                     sh """
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
-                    ${TRIVY_INSTALL_DIR}/trivy image ${GCR_HOST}/${IMAGE_NAME}:${env.BUILD_NUMBER}
+                    ${TRIVY_INSTALL_DIR}/trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
                     """
                 }
             }
@@ -124,7 +128,7 @@ pipeline {
                             --namespace ${KUBE_NAMESPACE} \
                             --create-namespace \
                             --set app.image.repository=${GCR_HOST}/${IMAGE_NAME} \
-                            --set app.image.tag=${env.BUILD_NUMBER} \
+                            --set app.image.tag=${BUILD_NUMBER} \
                             --kubeconfig $KUBECONFIG
                         """
                     }
