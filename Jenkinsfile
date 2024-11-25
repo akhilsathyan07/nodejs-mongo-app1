@@ -54,6 +54,7 @@ pipeline {
                             sh """
                             ${scannerHome}/bin/sonar-scanner \
                                 -Dsonar.projectVersion=1.0-SNAPSHOT \
+                                -Dsonar.qualityProfile="Sonar way" \
                                 -Dsonar.projectBaseDir=${WORKSPACE} \
                                 -Dsonar.projectKey=sonarqube \
                                 -Dsonar.sourceEncoding=UTF-8 \
@@ -62,6 +63,12 @@ pipeline {
                             """
                         }
                     }
+
+                    // Fetch SonarQube report and archive it
+                    sh '''
+                    curl -u ${SONAR_AUTH_TOKEN}: ${SONAR_HOST_URL}/api/issues/search?componentKeys=sonar-qube > sonarqube.json
+                    '''
+                    archiveArtifacts artifacts: 'sonarqube.json', fingerprint: true
                 }
             }
         }
@@ -137,8 +144,4 @@ pipeline {
         success {
             echo 'Deployment completed successfully!'
         }
-        failure {
-            echo 'Deployment failed!'
-        }
-    }
-}
+     
