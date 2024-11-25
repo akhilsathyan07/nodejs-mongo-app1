@@ -67,6 +67,19 @@ pipeline {
             }
         }
 
+        stage('Fetch SonarQube Issues') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'sonar-qube', variable: 'SONAR_AUTH_TOKEN')]) {
+                        sh """
+                        curl -u ${SONAR_AUTH_TOKEN}: http://34.45.141.16:9000/api/issues/search?componentKeys=sonarqube > sonarqube.json
+                        """
+                    }
+                    archiveArtifacts artifacts: 'sonarqube.json', fingerprint: true
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
