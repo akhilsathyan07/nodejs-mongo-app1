@@ -60,7 +60,8 @@ pipeline {
                                 -Dsonar.sourceEncoding=UTF-8 \
                                 -Dsonar.host.url=http://34.45.141.16:9000 \
                                 -Dsonar.token=$SONAR_TOKEN \
-                                -Dsonar.scm.provider=git
+                                -Dsonar.scm.provider=git \
+                                -Dsonar.scm.provider=svn
                             """
                         }
                     }
