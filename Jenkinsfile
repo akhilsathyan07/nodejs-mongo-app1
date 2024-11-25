@@ -54,7 +54,7 @@ pipeline {
                             sh """
                             ${scannerHome}/bin/sonar-scanner \
                                 -Dsonar.projectVersion=1.0-SNAPSHOT \
-                                -Dsonar.qualityProfile="Sonar way" \
+                                -Dsonar.qualityProfile="sonar-quality" \
                                 -Dsonar.projectBaseDir=${WORKSPACE} \
                                 -Dsonar.projectKey=sonarqube \
                                 -Dsonar.sourceEncoding=UTF-8 \
