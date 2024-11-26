@@ -144,7 +144,7 @@ pipeline {
             script {
                 def emailSubject
                 def emailBody
-                def recipientEmail = "akhilsathyanambattu@gmail.com"  // Correct email address here
+                def recipientEmail = "akhil.sathyan@urolime.com"  // Correct email address here
 
                 // Define the email subject and body based on build result
                 if (currentBuild.result == "SUCCESS") {
