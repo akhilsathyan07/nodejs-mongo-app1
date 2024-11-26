@@ -81,7 +81,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} .
+                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} . 
                     """
                 }
             }
@@ -162,6 +162,36 @@ pipeline {
                 }
 
                 // Send the email
+                emailext (
+                    subject: emailSubject,
+                    body: emailBody,
+                    to: recipientEmail
+                )
+            }
+        }
+
+        success {
+            script {
+                def emailSubject = "Deployment Success: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                def emailBody = """
+                The deployment of ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} was successful.
+                You can view the details at ${env.BUILD_URL}.
+                """
+                emailext (
+                    subject: emailSubject,
+                    body: emailBody,
+                    to: recipientEmail
+                )
+            }
+        }
+
+        failure {
+            script {
+                def emailSubject = "Deployment Failure: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
+                def emailBody = """
+                The deployment of ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} has failed.
+                You can view the details at ${env.BUILD_URL}.
+                """
                 emailext (
                     subject: emailSubject,
                     body: emailBody,
