@@ -106,8 +106,8 @@ pipeline {
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
 
-                    # Run Trivy scan and redirect the output to a file
-                    ${TRIVY_INSTALL_DIR}/trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
+                    # Run Trivy scan and display results in a human-readable table format
+                    ${TRIVY_INSTALL_DIR}/trivy image --format table ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
                     """
                     
                     // Archive the scan report as an artifact
