@@ -107,11 +107,15 @@ pipeline {
                     docker images
 
                     # Run Trivy scan and display results in a human-readable table format
-                    ${TRIVY_INSTALL_DIR}/trivy image --format table ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} | sed 's/\xe2\x80\xa6//g' | sed 's/\xe2\x80\x93//g' > trivy_scan_report.txt
+                    ${TRIVY_INSTALL_DIR}/trivy image --format table ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
+                    
+                    # Optionally, save results in JSON format for more detailed analysis
+                    ${TRIVY_INSTALL_DIR}/trivy image --format json ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.json
                     """
 
-                    // Archive the human-readable report as an artifact
+                    // Archive both the table and JSON format reports as artifacts
                     archiveArtifacts artifacts: 'trivy_scan_report.txt', fingerprint: true
+                    archiveArtifacts artifacts: 'trivy_scan_report.json', fingerprint: true
                 }
             }
         }
