@@ -104,8 +104,7 @@ pipeline {
                     sh """
                     # Check Trivy version and list Docker images
                     ${TRIVY_INSTALL_DIR}/trivy --version
-                    docker images
-
+            
                     # Run Trivy scan and redirect the output to a file
                     ${TRIVY_INSTALL_DIR}/trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
                     """
