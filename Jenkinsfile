@@ -108,10 +108,14 @@ pipeline {
 
                     # Run Trivy scan and display results in a human-readable table format
                     ${TRIVY_INSTALL_DIR}/trivy image --format table ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
-                    """
                     
-                    // Archive the scan report as an artifact
+                    # Optionally, save results in JSON format for more detailed analysis
+                    ${TRIVY_INSTALL_DIR}/trivy image --format json ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.json
+                    """
+
+                    // Archive both the table and JSON format reports as artifacts
                     archiveArtifacts artifacts: 'trivy_scan_report.txt', fingerprint: true
+                    archiveArtifacts artifacts: 'trivy_scan_report.json', fingerprint: true
                 }
             }
         }
