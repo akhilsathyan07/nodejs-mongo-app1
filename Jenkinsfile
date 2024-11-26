@@ -106,9 +106,51 @@ pipeline {
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
 
-                    # Run Trivy scan with table format
-                    ${TRIVY_INSTALL_DIR}/trivy image --format table ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
+                    # Run Trivy scan and redirect the output to a JSON file
+                    ${TRIVY_INSTALL_DIR}/trivy image --format json ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.json
                     """
+                    
+                    // Archive the scan report as an artifact in JSON format
+                    archiveArtifacts artifacts: 'trivy_scan_report.json', fingerprint: true
+                }
+            }
+        }
+
+        stage('Process SonarQube Issues') {
+            steps {
+                script {
+                    // Parse and format the SonarQube issues into a table format
+                    sh """
+                    jq -r '.issues[] | [.component, .rule, .severity, .message] | @tsv' sonarqube.json > sonar_issues_table.txt
+                    """
+                    archiveArtifacts artifacts: 'sonar_issues_table.txt', fingerprint: true
+                }
+            }
+        }
+
+        stage('Process Trivy Scan Report') {
+            steps {
+                script {
+                    // Parse and format Trivy scan JSON output into a tabular format
+                    sh """
+                    jq -r '.Results[].Vulnerabilities[] | [.PkgName, .VulnerabilityID, .Severity, .InstalledVersion, .FixedVersion] | @tsv' trivy_scan_report.json > trivy_table.txt
+                    """
+                    archiveArtifacts artifacts: 'trivy_table.txt', fingerprint: true
+                }
+            }
+        }
+
+        stage('Generate Final Output') {
+            steps {
+                script {
+                    // Combine and create the final formatted output
+                    sh """
+                    echo '--- Trivy Vulnerabilities ---' > pipeline_output.txt
+                    column -t -s$'\t' trivy_table.txt >> pipeline_output.txt
+                    echo '\n--- SonarQube Issues ---' >> pipeline_output.txt
+                    column -t -s$'\t' sonar_issues_table.txt >> pipeline_output.txt
+                    """
+                    archiveArtifacts artifacts: 'pipeline_output.txt', fingerprint: true
                 }
             }
         }
@@ -147,28 +189,30 @@ pipeline {
             script {
                 def emailSubject
                 def emailBody
-                def recipientEmail = "akhil.sathyan@urolime.com"  // Correct email address here
+                def recipientEmail = "akhil.sathyan@urolime.com"
 
                 // Define the email subject and body based on build result
                 if (currentBuild.result == "SUCCESS") {
                     emailSubject = "Pipeline Success: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
                     emailBody = """
                     The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} was successful.
-                    You can view the details at ${env.BUILD_URL}.
+                    Attached is the detailed scan and issue report.
                     """
                 } else {
                     emailSubject = "Pipeline Failure: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
                     emailBody = """
                     The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} has failed.
-                    You can view the details at ${env.BUILD_URL}.
+                    Attached is the detailed scan and issue report.
                     """
                 }
 
-                // Send the email
+                // Send the email with the formatted report
                 emailext (
                     subject: emailSubject,
                     body: emailBody,
-                    to: recipientEmail
+                    to: recipientEmail,
+                    attachLog: true,
+                    attachmentsPattern: 'pipeline_output.txt'
                 )
             }
         }
