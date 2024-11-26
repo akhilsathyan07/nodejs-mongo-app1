@@ -81,7 +81,18 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} . 
+                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} .
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image to GCR') {
+            steps {
+                script {
+                    sh """
+                    gcloud auth configure-docker ${GCR_HOST}
+                    docker push ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
                     """
                 }
             }
@@ -106,62 +117,12 @@ pipeline {
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
 
-                    # Run Trivy scan and redirect the output to a JSON file
-                    ${TRIVY_INSTALL_DIR}/trivy image --format json ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.json
+                    # Run Trivy scan and redirect the output to a file
+                    ${TRIVY_INSTALL_DIR}/trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
                     """
                     
-                    // Archive the scan report as an artifact in JSON format
-                    archiveArtifacts artifacts: 'trivy_scan_report.json', fingerprint: true
-                }
-            }
-        }
-
-        stage('Process SonarQube Issues') {
-            steps {
-                script {
-                    // Parse and format the SonarQube issues into a table format
-                    sh """
-                    jq -r '.issues[] | [.component, .rule, .severity, .message] | @tsv' sonarqube.json > sonar_issues_table.txt
-                    """
-                    archiveArtifacts artifacts: 'sonar_issues_table.txt', fingerprint: true
-                }
-            }
-        }
-
-        stage('Process Trivy Scan Report') {
-            steps {
-                script {
-                    // Parse and format Trivy scan JSON output into a tabular format
-                    sh """
-                    jq -r '.Results[].Vulnerabilities[] | [.PkgName, .VulnerabilityID, .Severity, .InstalledVersion, .FixedVersion] | @tsv' trivy_scan_report.json > trivy_table.txt
-                    """
-                    archiveArtifacts artifacts: 'trivy_table.txt', fingerprint: true
-                }
-            }
-        }
-
-        stage('Generate Final Output') {
-            steps {
-                script {
-                    // Combine and create the final formatted output
-                    sh """
-                    echo '--- Trivy Vulnerabilities ---' > pipeline_output.txt
-                    column -t -s$'\t' trivy_table.txt >> pipeline_output.txt
-                    echo '\n--- SonarQube Issues ---' >> pipeline_output.txt
-                    column -t -s$'\t' sonar_issues_table.txt >> pipeline_output.txt
-                    """
-                    archiveArtifacts artifacts: 'pipeline_output.txt', fingerprint: true
-                }
-            }
-        }
-
-        stage('Push Docker Image to GCR') {
-            steps {
-                script {
-                    sh """
-                    gcloud auth configure-docker ${GCR_HOST}
-                    docker push ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
-                    """
+                    // Archive the scan report as an artifact
+                    archiveArtifacts artifacts: 'trivy_scan_report.txt', fingerprint: true
                 }
             }
         }
@@ -189,30 +150,28 @@ pipeline {
             script {
                 def emailSubject
                 def emailBody
-                def recipientEmail = "akhil.sathyan@urolime.com"
+                def recipientEmail = "akhil.sathyan@urolime.com"  // Correct email address here
 
                 // Define the email subject and body based on build result
                 if (currentBuild.result == "SUCCESS") {
                     emailSubject = "Pipeline Success: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
                     emailBody = """
                     The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} was successful.
-                    Attached is the detailed scan and issue report.
+                    You can view the details at ${env.BUILD_URL}.
                     """
                 } else {
                     emailSubject = "Pipeline Failure: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
                     emailBody = """
                     The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} has failed.
-                    Attached is the detailed scan and issue report.
+                    You can view the details at ${env.BUILD_URL}.
                     """
                 }
 
-                // Send the email with the formatted report
+                // Send the email
                 emailext (
                     subject: emailSubject,
                     body: emailBody,
-                    to: recipientEmail,
-                    attachLog: true,
-                    attachmentsPattern: 'pipeline_output.txt'
+                    to: recipientEmail
                 )
             }
         }
