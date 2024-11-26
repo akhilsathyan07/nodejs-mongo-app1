@@ -81,18 +81,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} .
-                    """
-                }
-            }
-        }
-
-        stage('Push Docker Image to GCR') {
-            steps {
-                script {
-                    sh """
-                    gcloud auth configure-docker ${GCR_HOST}
-                    docker push ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
+                    docker build -t ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} . 
                     """
                 }
             }
@@ -123,6 +112,17 @@ pipeline {
                     
                     // Archive the scan report as an artifact
                     archiveArtifacts artifacts: 'trivy_scan_report.txt', fingerprint: true
+                }
+            }
+        }
+
+        stage('Push Docker Image to GCR') {
+            steps {
+                script {
+                    sh """
+                    gcloud auth configure-docker ${GCR_HOST}
+                    docker push ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER}
+                    """
                 }
             }
         }
