@@ -101,17 +101,43 @@ pipeline {
         stage('Scan Docker Image') {
             steps {
                 script {
+                    // Run Trivy scan and output both the detailed and summary information
                     sh """
                     # Check Trivy version and list Docker images
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
 
-                    # Run Trivy scan and display results in a human-readable table format
+                    # Run Trivy scan with table format and redirect the output to a file
                     ${TRIVY_INSTALL_DIR}/trivy image --format table ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
+
+                    # Run Trivy scan in JSON format to extract vulnerability summary
+                    ${TRIVY_INSTALL_DIR}/trivy image --format json ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report_json.json
+
+                    # Extract total vulnerabilities count and severity breakdown
+                    jq '.Summary' trivy_scan_report_json.json > trivy_scan_summary.txt
                     """
-                    
-                    // Archive the scan report as an artifact
+
+                    // Archive the detailed report, JSON report, and summary
                     archiveArtifacts artifacts: 'trivy_scan_report.txt', fingerprint: true
+                    archiveArtifacts artifacts: 'trivy_scan_summary.txt', fingerprint: true
+                }
+            }
+        }
+
+        stage('Check Vulnerabilities and Await Approval') {
+            steps {
+                script {
+                    // Read Trivy summary to check for vulnerabilities
+                    def trivySummary = readFile('trivy_scan_summary.txt')
+                    echo "Trivy Summary: ${trivySummary}"
+
+                    // Check if there are any vulnerabilities
+                    def hasVulnerabilities = trivySummary.contains('CRITICAL') || trivySummary.contains('HIGH') || trivySummary.contains('MEDIUM')
+
+                    if (hasVulnerabilities) {
+                        // If vulnerabilities are found, wait for manual approval before proceeding
+                        input message: 'Vulnerabilities found in Docker image. Approve deployment?', ok: 'Approve', timeout: 1 * 60 * 60, timeoutMessage: 'Approval timeout exceeded. Aborting deployment.'
+                    }
                 }
             }
         }
