@@ -144,17 +144,24 @@ pipeline {
             script {
                 def emailSubject
                 def emailBody
-                def recipientEmail = "akhilsathyanambattu@gmail.com"
+                def recipientEmail = "akhilsathyanambattu@gmail.com"  // Correct email address here
 
+                // Define the email subject and body based on build result
                 if (currentBuild.result == "SUCCESS") {
                     emailSubject = "Pipeline Success: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                    emailBody = "The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} was successful. You can view the details at ${env.BUILD_URL}"
-                }
-                else {
+                    emailBody = """
+                    The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} was successful.
+                    You can view the details at ${env.BUILD_URL}.
+                    """
+                } else {
                     emailSubject = "Pipeline Failure: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
-                    emailBody = "The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} has failed. You can view the details at ${env.BUILD_URL}"
+                    emailBody = """
+                    The pipeline run for ${env.JOB_NAME} - Build #${env.BUILD_NUMBER} has failed.
+                    You can view the details at ${env.BUILD_URL}.
+                    """
                 }
 
+                // Send the email
                 emailext (
                     subject: emailSubject,
                     body: emailBody,
