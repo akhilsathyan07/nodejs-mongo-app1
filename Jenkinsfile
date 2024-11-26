@@ -106,12 +106,12 @@ pipeline {
                     ${TRIVY_INSTALL_DIR}/trivy --version
                     docker images
 
-                    # Run Trivy scan and redirect the output to a JSON file
-                    ${TRIVY_INSTALL_DIR}/trivy image --format json ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.json
+                    # Run Trivy scan and redirect the output to a file
+                    ${TRIVY_INSTALL_DIR}/trivy image ${GCR_HOST}/${IMAGE_NAME}:${BUILD_NUMBER} > trivy_scan_report.txt
                     """
                     
-                    // Archive the scan report as an artifact in JSON format
-                    archiveArtifacts artifacts: 'trivy_scan_report.json', fingerprint: true
+                    // Archive the scan report as an artifact
+                    archiveArtifacts artifacts: 'trivy_scan_report.txt', fingerprint: true
                 }
             }
         }
