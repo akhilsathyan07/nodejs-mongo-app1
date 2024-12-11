@@ -6,7 +6,7 @@ pipeline {
         PROJECT_ID = "symmetric-ion-441609-t1"
         GCR_HOST = "us-central1-docker.pkg.dev/symmetric-ion-441609-t1/gc-registry07"
         IMAGE_NAME = "nodejs-mongo-app"
-        #IMAGE_TAG = "${BUILD_NUMBER}"
+        // IMAGE_TAG = "${BUILD_NUMBER}"
         
         // Kubernetes Namespace
         KUBE_NAMESPACE = "node-mongo"
